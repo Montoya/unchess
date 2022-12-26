@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'Nishiki-teki';
+    src: url('subset-Nishiki-teki.woff2') format('woff2'),
+        url('subset-Nishiki-teki.woff') format('woff'),
+        url('subset-Nishiki-teki.svg#Nishiki-teki') format('svg');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
