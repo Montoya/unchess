@@ -50,7 +50,7 @@
     .chessRow { display:table-row; }
     .chessCell { 
       display:table-cell; 
-      border:2px solid #000;
+      border:2px solid #222;
       width:88px; 
       height:88px;
       font-size:64px; 
@@ -71,6 +71,14 @@
     }
     .chessKnight::after { 
       content: "\002658";
+    }
+
+    body.themeDark { 
+      color:#fafafa;
+      background-color:#111; 
+    }
+    body.themeDark .chessCell { 
+      border-color:#ccc; 
     }
 
   </style>
