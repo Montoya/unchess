@@ -20,6 +20,15 @@
       font-style: normal;
       font-display: swap;
     }
+    @font-face { 
+      font-family: 'Plantin MT Pro';
+      src: url('subset-PlantinMTPro-Regular.woff2') format('woff2'),
+          url('subset-PlantinMTPro-Regular.woff') format('woff'),
+          url('subset-PlantinMTPro-Regular.svg#PlantinMTPro-Regular') format('svg');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
 
     #logo {
       display: inline-block;
@@ -41,14 +50,15 @@
     }
 
     body { 
-      font-family:'Nishiki-teki'; 
-      font-weight:500; 
+      font-family:'Plantin MT Pro','Times New Roman',Times,serif; 
+      font-weight:normal; 
     }
     h1,h2,h3,h4,h5,h6 { font-weight:inherit; }
 
     .chessBoard { display:table; border-collapse: collapse; }
     .chessRow { display:table-row; }
     .chessCell { 
+      font-family:'Nishiki-teki';
       display:table-cell; 
       border:2px solid #222;
       width:88px; 
