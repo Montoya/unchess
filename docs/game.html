@@ -38,32 +38,39 @@
       -webkit-filter: drop-shadow(0 0 3px rgba(255, 255, 255, .7));
       filter: drop-shadow(0 0 3px rgba(255, 255, 255, .7));
     }
-
     #logo-cite {
       margin-bottom: 7px;
     }
-
     #logo img {
       vertical-align: bottom;
     }
 
-    body { 
+    /* blood color : D10000 */
+    html, body { 
       font-family:'Plantin MT Pro','Times New Roman',Times,serif; 
+      font-size:10px; 
     }
     h1,h2,h3,h4,h5,h6 { font-weight:inherit; }
 
-    .chessBoard { display:table; border-collapse: collapse; }
+    .chessBoard { display:table; border-collapse: collapse; margin:0 auto; }
     .chessRow { display:table-row; }
     .chessCell { 
       font-family:'Nishiki-teki';
       font-weight:500; 
       display:table-cell; 
-      border:2px solid #222;
-      width:88px; 
-      height:88px;
-      font-size:64px; 
+      border:0.2rem solid #222;
+      width:8.8rem; 
+      height:8.8rem;
+      font-size:6.4rem; 
       text-align:center;
-      line-height:88px; 
+      line-height:8.8rem; 
+      overflow:hidden; 
+    }
+    .chessCell.selected { 
+      color:#d10000; 
+      font-size:7.2rem;
+      height:8.8rem!important;
+      line-height:8.8rem;
     }
     .chessKing::after { 
       content: "\002654"; 
@@ -76,6 +83,7 @@
     }
     .chessBishop::after { 
       content: "\002657"; 
+      margin-bottom:-3px;
     }
     .chessKnight::after { 
       content: "\002658";
@@ -99,24 +107,24 @@
       padding:0;
     }
     #DominGame { 
-      width:480px;
-      height:640px;
+      width:48rem;
+      height:64rem;
     }
     #screenStart { 
       text-align:center;
     }
     h1 { 
-      font-size:3rem; 
-      padding-bottom:5rem; 
+      font-size:4.8rem; 
+      padding-bottom:9.6rem; 
     }
     #screenStartGameOptions { 
-      padding-bottom:4rem;
+      padding-bottom:6.4rem;
     }
     p.screenStartGameOption { 
-      font-size:2rem; 
+      font-size:3.2rem; 
     }
     p.screenStartMenuOption { 
-      font-size:1.5rem; 
+      font-size:2.4rem; 
     }
 
   </style>
@@ -137,7 +145,7 @@
       </div>
     </div>
     <div id="screenPlayAnarchy" class="DominScreen">
-      <p>The game goes here!</p>
+      <div id="playBoard"></div>
     </div>
   </div>
 <!-- 
@@ -184,6 +192,24 @@
 
   -->
   <script type="text/javascript">
+
+const gamedata = [
+  {
+    "mode":3,
+    "set":1,
+    "board":1,
+    "data":"00004|04020|00003|04000|00030", 
+  },
+]; 
+
+const chessPieces = [
+  "empty",
+  "chessKing",
+  "chessBishop",
+  "chessKnight", 
+  "chessRook"
+]; 
+
     /* DominGame assumes that the Domin IDs and classes are used in the document */ 
     class DominGame { 
       constructor() { 
@@ -215,6 +241,34 @@
     const unchessGame = new DominGame(); 
     document.getElementById("buttonPlayAnarchy").addEventListener("click", function(evt) { 
       unchessGame.changeScreen("screenPlayAnarchy"); 
+      const boardData = gamedata[0].data.split("|"); 
+      const board = document.createElement("div"); 
+      board.id = "playBoard"; 
+      const chessBoard = document.createElement("div"); 
+      chessBoard.className = "chessBoard"; 
+      for(let y = 0; y < boardData.length; y++) { 
+        let chessRow = document.createElement("div"); 
+        chessRow.className = "chessRow"; 
+        let rowData = boardData[y].split(""); 
+        for(let x = 0; x < rowData.length; x++) { 
+          let chessCell = document.createElement("span"); 
+          chessCell.setAttribute("data-pos-x",x); 
+          chessCell.setAttribute("data-pos-y",y); 
+          chessCell.setAttribute("data-piece",rowData[x]); 
+          chessCell.className = "chessCell "+chessPieces[rowData[x]]; 
+          chessRow.appendChild(chessCell); 
+        }
+        chessBoard.appendChild(chessRow); 
+      }
+      board.appendChild(chessBoard); 
+      document.getElementById("playBoard").replaceWith(board); 
+      let pieces = document.querySelectorAll("#playBoard span:not(.empty)"); 
+      pieces.forEach((piece) => {
+        piece.addEventListener("click",function(evt){
+          evt.target.classList.add("selected"); 
+          evt.target.style.color = "#D10000"; 
+        });
+      });  
     }); 
   </script>
 </body>
