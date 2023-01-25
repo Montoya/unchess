@@ -63,8 +63,8 @@
       height:8.8rem;
       font-size:6.4rem; 
       text-align:center;
-      line-height:8.8rem; 
-      overflow:hidden; 
+      line-height:1.0;
+      vertical-align:middle;
     }
     .chessCell.selected { 
       color:#d10000; 
@@ -83,7 +83,6 @@
     }
     .chessBishop::after { 
       content: "\002657"; 
-      margin-bottom:-3px;
     }
     .chessKnight::after { 
       content: "\002658";
@@ -262,11 +261,9 @@ const chessPieces = [
       }
       board.appendChild(chessBoard); 
       document.getElementById("playBoard").replaceWith(board); 
-      let pieces = document.querySelectorAll("#playBoard span:not(.empty)"); 
-      pieces.forEach((piece) => {
+      document.querySelectorAll("#playBoard span:not(.empty)").forEach((piece) => {
         piece.addEventListener("click",function(evt){
           evt.target.classList.add("selected"); 
-          evt.target.style.color = "#D10000"; 
         });
       });  
     }); 
