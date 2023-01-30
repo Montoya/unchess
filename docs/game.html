@@ -114,10 +114,11 @@
     }
     h1 { 
       font-size:4.8rem; 
-      padding-bottom:9.6rem; 
+      padding-top:1.6rem;
+      padding-bottom:6.4rem; 
     }
     #screenStartGameOptions { 
-      padding-bottom:6.4rem;
+      padding-bottom:5rem;
     }
     p.screenStartGameOption { 
       font-size:3.2rem; 
@@ -137,6 +138,7 @@
       <div id="screenStartGameOptions">
         <p id="buttonPlayAnarchy" class="screenStartGameOption">Anarchy</p>
         <p class="screenStartGameOption">Mutiny</p>
+        <p class="screenStartGameOption">Highlander</p>
       </div>
       <div id="screenStartMenuOptions">
         <p class="screenStartMenuOption">Help</p>
@@ -198,6 +200,7 @@ const gamedata = [
     "set":1,
     "board":1,
     "data":"00004|04020|00003|04000|00030", 
+    "completed":false
   },
 ]; 
 
@@ -208,6 +211,14 @@ const chessPieces = [
   "chessKnight", 
   "chessRook"
 ]; 
+
+const chessPiecesLookup = { 
+  "empty":0,
+  "chessKing":1,
+  "chessBishop":2,
+  "chessKnight":3,
+  "chessRook":4
+}; 
 
     /* DominGame assumes that the Domin IDs and classes are used in the document */ 
     class DominGame { 
@@ -237,6 +248,238 @@ const chessPieces = [
       }
     }
 
+    const getPieceAt = (x,y) => { 
+      return document.querySelector("#playBoard span:not(.empty)[data-pos-x='"+x+"'][data-pos-y='"+y+"']"); 
+    }
+
+    const getCellAt = (x,y) => { 
+      return document.querySelector("#playBoard span[data-pos-x='"+x+"'][data-pos-y='"+y+"']"); 
+    }
+
+    const getPossibleMoves = (el) => { 
+      let possibleMoves = []; 
+      const selectedX = parseInt(el.dataset.posX); 
+      const selectedY = parseInt(el.dataset.posY); 
+      const selectedPiece = parseInt(el.dataset.piece); 
+      let newX, newY, newCell, newPiece; 
+      switch(selectedPiece) { 
+        case chessPiecesLookup.chessBishop: 
+          // 4 directions
+          newX = selectedX - 1; 
+          newY = selectedY - 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX--; 
+              newY--; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX - 1; 
+          newY = selectedY + 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX--; 
+              newY++; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX + 1; 
+          newY = selectedY - 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX++; 
+              newY--; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX + 1; 
+          newY = selectedY + 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX++; 
+              newY++; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          break; 
+        case chessPiecesLookup.chessKnight: 
+          // 8 checks 
+          newX = selectedX - 1; 
+          newY = selectedY - 2; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX - 2; 
+          newY = selectedY - 1; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX + 1; 
+          newY = selectedY + 2; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX + 2; 
+          newY = selectedY + 1; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX - 1; 
+          newY = selectedY + 2; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX - 2; 
+          newY = selectedY + 1; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX + 1; 
+          newY = selectedY - 2; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX + 2; 
+          newY = selectedY - 1; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          break; 
+        case chessPiecesLookup.chessRook: 
+          // 4 directions
+          newX = selectedX - 1; 
+          newY = selectedY; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX--; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX; 
+          newY = selectedY - 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newY--; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX + 1; 
+          newY = selectedY; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX++; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX; 
+          newY = selectedY + 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newY++; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          break; 
+      }
+      return possibleMoves; 
+    }; 
+
+    const removePiece = (el) => { 
+      el.className = "chessCell empty"; 
+      el.dataset.piece = chessPiecesLookup.empty; 
+    }
+
+    const handleAnarchyClick = (evt) => { 
+      // assume a valid game of anarchy unchess is in play 
+      let selected = document.querySelector("#playBoard span.selected"); 
+      if(null===selected) { 
+        // nothing is selected! 
+        evt.target.classList.add("selected");  
+      }
+      else if (evt.target === selected) { 
+        // user has clicked the selected piece, so let's unselect it
+        evt.target.classList.remove("selected"); 
+      }
+      else { 
+        // determine if a move is possible... 
+        // first, get all the possible moves
+        const possibleMoves = getPossibleMoves(selected); 
+        // then, determine if this is in the set of possible moves 
+        try { 
+          let targetMove = evt.target.dataset.posX + "|" + evt.target.dataset.posY; 
+          if(possibleMoves.includes(targetMove)) { 
+            // we have a hit! this is anarchy, so both pieces are eliminated 
+            removePiece(evt.target); 
+            removePiece(selected); 
+            selected.removeEventListener("click",handleAnarchyClick); 
+            evt.target.removeEventListener("click",handleAnarchyClick); 
+            checkAnarchyWin(); 
+          }
+          else { 
+            // user has clicked a different piece that is not a valid move, so just unselect
+            selected.classList.remove("selected"); 
+          }
+        } catch(err) { 
+          console.log(err); 
+        }
+      }
+    }; 
+
+    const checkAnarchyWin = () => { 
+      if(null===document.querySelector("#playBoard span:not(.empty)")) { 
+        alert("YOU WIN!"); 
+        unchessGame.changeScreen("screenStart"); 
+      }
+    }
+
     const unchessGame = new DominGame(); 
     document.getElementById("buttonPlayAnarchy").addEventListener("click", function(evt) { 
       unchessGame.changeScreen("screenPlayAnarchy"); 
@@ -262,9 +505,7 @@ const chessPieces = [
       board.appendChild(chessBoard); 
       document.getElementById("playBoard").replaceWith(board); 
       document.querySelectorAll("#playBoard span:not(.empty)").forEach((piece) => {
-        piece.addEventListener("click",function(evt){
-          evt.target.classList.add("selected"); 
-        });
+        piece.addEventListener("click",handleAnarchyClick);
       });  
     }); 
   </script>
