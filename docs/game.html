@@ -105,7 +105,7 @@
       margin:0;  
       padding:0;
     }
-    #DominGame { 
+    #DominUI { 
       width:48rem;
       height:64rem;
     }
@@ -119,11 +119,9 @@
     }
     #screenStartGameOptions { 
       padding-bottom:5rem;
-    }
-    p.screenStartGameOption { 
       font-size:3.2rem; 
     }
-    p.screenStartMenuOption { 
+    #screenStartMenuOptions { 
       font-size:2.4rem; 
     }
 
@@ -132,20 +130,20 @@
 
 <body>
 
-  <div id="DominGame">
+  <div id="DominUI">
     <div id="screenStart" class="DominScreen"> 
       <h1 id="screenStartTitle">Unchess</h1>
       <div id="screenStartGameOptions">
-        <p id="buttonPlayAnarchy" class="screenStartGameOption">Anarchy</p>
-        <p class="screenStartGameOption">Mutiny</p>
-        <p class="screenStartGameOption">Highlander</p>
+        <p class="DominButton" data-to-screen="screenPlay" data-followup="startAnarchyGame">Anarchy</p>
+        <p class="DominButton">Mutiny</p>
+        <p class="DominButton">Highlander</p>
       </div>
       <div id="screenStartMenuOptions">
         <p class="screenStartMenuOption">Help</p>
         <p class="screenStartMenuOption">Settings</p>
       </div>
     </div>
-    <div id="screenPlayAnarchy" class="DominScreen">
+    <div id="screenPlay" class="DominScreen">
       <div id="playBoard"></div>
     </div>
   </div>
@@ -194,48 +192,62 @@
   -->
   <script type="text/javascript">
 
-const gamedata = [
-  {
-    "mode":3,
-    "set":1,
-    "board":1,
-    "data":"00004|04020|00003|04000|00030", 
-    "completed":false
-  },
-]; 
+    const anarchyGameData = [
+      {
+        "mode":3,
+        "set":1,
+        "board":1,
+        "data":"00004|04020|00003|04000|00030", 
+        "completed":false
+      },
+    ]; 
 
-const chessPieces = [
-  "empty",
-  "chessKing",
-  "chessBishop",
-  "chessKnight", 
-  "chessRook"
-]; 
+    const chessPieces = [
+      "empty",
+      "chessKing",
+      "chessBishop",
+      "chessKnight", 
+      "chessRook"
+    ]; 
 
-const chessPiecesLookup = { 
-  "empty":0,
-  "chessKing":1,
-  "chessBishop":2,
-  "chessKnight":3,
-  "chessRook":4
-}; 
+    const chessPiecesLookup = { 
+      "empty":0,
+      "chessKing":1,
+      "chessBishop":2,
+      "chessKnight":3,
+      "chessRook":4
+    }; 
 
-    /* DominGame assumes that the Domin IDs and classes are used in the document */ 
-    class DominGame { 
+    /* DominUI assumes that the Domin IDs and classes are used in the document */ 
+    class DominUI { 
       constructor() { 
         try { 
-          this.container = document.getElementById('DominGame'); 
+          this.container = document.getElementById('DominUI'); 
           // assume that the game container contains screens
           this.screens = this.container.getElementsByClassName('DominScreen'); 
           if(this.screens.length < 1) { throw "No screens"; }
+          // enable all buttons that change screens
+          this.buttons = this.container.getElementsByClassName('DominButton'); 
+          if(this.buttons.length < 1) { throw "No buttons"; }
         } catch(err) { 
-          console.log("The document does not contain a valid game."); 
+          console.log("The document does not contain a valid UI for Domin to initialize."); 
           return; 
         }
         // hide all screens after the first one 
         if(this.screens.length > 0) { 
           for(let i = 1; i < this.screens.length; i++) { 
             this.screens[i].style.display = 'none'; 
+          }
+        }
+        // enable all buttons
+        for(let i = 0; i < this.buttons.length; i++) { 
+          let btn = this.buttons[i]; 
+          if(btn.dataset.toScreen) { 
+            btn.addEventListener('click', () => { this.changeScreen(btn.dataset.toScreen); }, false); 
+          }
+          if(btn.dataset.followup) { 
+            // it is assumed that any "followup" function is added to the DominUI object so it can by called by reference this way 
+            btn.addEventListener('click', () => { this[btn.dataset.followup].call(); }, false); 
           }
         }
       }
@@ -478,12 +490,9 @@ const chessPiecesLookup = {
         alert("YOU WIN!"); 
         unchessGame.changeScreen("screenStart"); 
       }
-    }
+    }; 
 
-    const unchessGame = new DominGame(); 
-    document.getElementById("buttonPlayAnarchy").addEventListener("click", function(evt) { 
-      unchessGame.changeScreen("screenPlayAnarchy"); 
-      const boardData = gamedata[0].data.split("|"); 
+    const makeBoardWithData = (boardData) => { 
       const board = document.createElement("div"); 
       board.id = "playBoard"; 
       const chessBoard = document.createElement("div"); 
@@ -503,11 +512,18 @@ const chessPiecesLookup = {
         chessBoard.appendChild(chessRow); 
       }
       board.appendChild(chessBoard); 
-      document.getElementById("playBoard").replaceWith(board); 
+      return board; 
+    }; 
+
+    const unchessGame = new DominUI(); 
+    
+    unchessGame.startAnarchyGame = () => { 
+      const boardData = anarchyGameData[0].data.split("|"); 
+      document.getElementById("playBoard").replaceWith(makeBoardWithData(boardData)); 
       document.querySelectorAll("#playBoard span:not(.empty)").forEach((piece) => {
         piece.addEventListener("click",handleAnarchyClick);
       });  
-    }); 
+    }; 
   </script>
 </body>
 
