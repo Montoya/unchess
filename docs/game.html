@@ -135,7 +135,7 @@
       <h1 id="screenStartTitle">Unchess</h1>
       <div id="screenStartGameOptions">
         <p class="DominButton" data-to-screen="screenPlay" data-followup="startAnarchyGame">Anarchy</p>
-        <p class="DominButton">Mutiny</p>
+        <p class="DominButton" data-to-screen="screenPlay" data-followup="startMutinyGame">Mutiny</p>
         <p class="DominButton">Highlander</p>
       </div>
       <div id="screenStartMenuOptions">
@@ -194,10 +194,21 @@
 
     const anarchyGameData = [
       {
-        "mode":3,
+        "mode":1,
         "set":1,
         "board":1,
         "data":"00004|04020|00003|04000|00030", 
+        "completed":false
+      },
+    ]; 
+
+    const mutinyGameData = [
+      { 
+        "mode":2,
+        "set":1,
+        "board":1,
+        "data":"00002|03304|00010|04020|03004",
+        "start":[1,4],
         "completed":false
       },
     ]; 
@@ -485,6 +496,51 @@
       }
     }; 
 
+    const handleMutinyClick = (evt) => { 
+      // assume a valid game of mutiny unchess is in play 
+      let selected = document.querySelector("#playBoard span.selected"); 
+      if(null===selected) { 
+        // this should never happen in a game of mutiny 
+        alert("This game of mutiny is broken..."); 
+        return; 
+      }
+      else { 
+        // determine if a move is possible... 
+        // first, get all the possible moves
+        const possibleMoves = getPossibleMoves(selected); 
+        // then, determine if this is in the set of possible moves 
+        try { 
+          let targetMove = evt.target.dataset.posX + "|" + evt.target.dataset.posY; 
+          if(possibleMoves.includes(targetMove)) { 
+            // first, check if the player is trying to capture the king
+            if(evt.target.dataset.piece == chessPiecesLookup.chessKing) { 
+              let pieces = document.querySelectorAll("#playBoard span:not(.empty)"); 
+              if(pieces.length > 2) { 
+                // player cannot capture the king yet
+                alert("You have to eliminate all the other pieces before you can capture the king!"); 
+              }
+              else { 
+                removePiece(selected); 
+                removePiece(evt.target); 
+                selected.removeEventListener("click",handleMutinyClick); 
+                evt.target.removeEventListener("click",handleMutinyClick); 
+                alert("YOU WIN!"); 
+                unchessGame.changeScreen("screenStart"); 
+              }
+            }
+            else { 
+              // we have a hit! this is mutiny, so the selected piece is eliminated and the target piece becomes the selected piece 
+              removePiece(selected); 
+              selected.removeEventListener("click",handleMutinyClick); 
+              evt.target.classList.add('selected'); 
+            }
+          }
+        } catch(err) { 
+          console.log(err); 
+        }
+      }
+    }; 
+
     const checkAnarchyWin = () => { 
       if(null===document.querySelector("#playBoard span:not(.empty)")) { 
         alert("YOU WIN!"); 
@@ -524,6 +580,18 @@
         piece.addEventListener("click",handleAnarchyClick);
       });  
     }; 
+
+    unchessGame.startMutinyGame = () => { 
+      const boardData = mutinyGameData[0].data.split("|"); 
+      document.getElementById("playBoard").replaceWith(makeBoardWithData(boardData)); 
+      // a game of mutiny always starts with a selected piece 
+      let startPosition = mutinyGameData[0].start; 
+      let startPiece = getPieceAt(startPosition[0],startPosition[1]); 
+      startPiece.classList.add('selected'); 
+      document.querySelectorAll("#playBoard span:not(.empty)").forEach((piece) => {
+        piece.addEventListener("click",handleMutinyClick);
+      });  
+    }
   </script>
 </body>
 
