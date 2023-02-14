@@ -182,6 +182,9 @@
       float:left; 
       padding:0 1.2rem 0 0; 
     }
+    #levelSelectContent .completed { 
+      text-decoration:line-through;
+    }
     #playBoard { 
       margin-top:2.4rem; 
     }
@@ -287,6 +290,20 @@
         "data":"00004|04020|00003|04000|00030", 
         "completed":false
       },
+      {
+        "mode":1,
+        "set":1,
+        "board":2,
+        "data":"40000|00040|00300|30020|02000", 
+        "completed":false
+      },
+      {
+        "mode":1,
+        "set":1,
+        "board":3,
+        "data":"00040|03000|00200|00300|02040", 
+        "completed":false
+      },
     ]; 
 
     const mutinyGameData = [
@@ -302,6 +319,38 @@
         "mode":2,
         "set":1,
         "board":2,
+        "data":"40002|00000|03100|00000|30004",
+        "start":[4,4],
+        "completed":false
+      },
+      { 
+        "mode":2,
+        "set":1,
+        "board":3,
+        "data":"00000|01000|00200|02020|20200",
+        "start":[2,4],
+        "completed":false
+      },
+      { 
+        "mode":2,
+        "set":1,
+        "board":4,
+        "data":"03000|00030|33000|00310|00000",
+        "start":[2,3],
+        "completed":false
+      },
+      { 
+        "mode":2,
+        "set":1,
+        "board":5,
+        "data":"00404|40404|00000|40400|00100",
+        "start":[2,3],
+        "completed":false
+      },
+      { 
+        "mode":2,
+        "set":1,
+        "board":6,
         "data":"00002|03304|00010|04020|03004",
         "start":[1,4],
         "completed":false
@@ -320,6 +369,13 @@
         "mode":3,
         "set":1,
         "board":2,
+        "data":"00304|00000|00203|30000|00000", 
+        "completed":false
+      }, 
+      { 
+        "mode":3,
+        "set":1,
+        "board":3,
         "data":"00042|00300|40004|03000|00030", 
         "completed":false
       }, 
@@ -611,6 +667,9 @@
     const checkAnarchyWin = () => { 
       if(null===document.querySelector("#playBoard span:not(.empty)")) { 
         alert("YOU WIN!"); 
+        let board = parseInt(document.getElementById('playBoard').dataset.board); 
+        anarchyGameData[board].completed = true; 
+        document.getElementById('anarchy-level-'+board).classList.add('completed'); 
         unchessGame.changeScreen("screenLevelSelect"); 
       }
     };
@@ -644,6 +703,9 @@
                 selected.removeEventListener("click",handleMutinyClick); 
                 evt.target.removeEventListener("click",handleMutinyClick); 
                 alert("YOU WIN!"); 
+                let board = parseInt(document.getElementById('playBoard').dataset.board); 
+                mutinyGameData[board].completed = true; 
+                document.getElementById('mutiny-level-'+board).classList.add('completed'); 
                 unchessGame.changeScreen("screenLevelSelect"); 
               }
             }
@@ -700,6 +762,9 @@
       let pieces = document.querySelectorAll("#playBoard span:not(.empty)"); 
       if(pieces.length < 2) { 
         alert("YOU WIN!"); 
+        let board = parseInt(document.getElementById('playBoard').dataset.board); 
+        highlanderGameData[board].completed = true; 
+        document.getElementById('highlander-level-'+board).classList.add('completed'); 
         unchessGame.changeScreen("screenLevelSelect"); 
       }
     };
@@ -728,15 +793,6 @@
     }; 
 
     const unchessGame = new DominUI(); 
-    /*
-    unchessGame.startAnarchyGame = () => { 
-      const boardData = anarchyGameData[0].data.split("|"); 
-      document.getElementById("playBoard").replaceWith(makeBoardWithData(boardData)); 
-      document.querySelectorAll("#playBoard span:not(.empty)").forEach((piece) => {
-        piece.addEventListener("click",handleAnarchyClick);
-      });  
-    }; 
-    */ 
     
     unchessGame.listAnarchyLevels = () => { 
       const levelsContainer = document.createElement('div'); 
@@ -746,7 +802,11 @@
         let levelNum = i; 
         let levelName = numberToWords(level.board); 
         let levelP = document.createElement('p'); 
+        levelP.id = 'anarchy-level-'+levelNum; 
         levelP.className = 'DominButton'; 
+        if(anarchyGameData[i].completed) { 
+          levelP.className += ' completed'; 
+        }
         levelP.textContent = levelName; 
         levelP.addEventListener('click',() => { startAnarchyGame(levelNum); return false; }); 
         levelsContainer.appendChild(levelP); 
@@ -773,7 +833,11 @@
         let levelNum = i; 
         let levelName = numberToWords(level.board); 
         let levelP = document.createElement('p'); 
+        levelP.id = 'mutiny-level-'+levelNum; 
         levelP.className = 'DominButton'; 
+        if(mutinyGameData[i].completed) { 
+          levelP.className += ' completed'; 
+        }
         levelP.textContent = levelName; 
         levelP.addEventListener('click',() => { startMutinyGame(levelNum); return false; }); 
         levelsContainer.appendChild(levelP); 
@@ -804,7 +868,11 @@
         let levelNum = i; 
         let levelName = numberToWords(level.board); 
         let levelP = document.createElement('p'); 
+        levelP.id = 'highlander-level-'+levelNum; 
         levelP.className = 'DominButton'; 
+        if(highlanderGameData[i].completed) { 
+          levelP.className += ' completed'; 
+        }
         levelP.textContent = levelName; 
         levelP.addEventListener('click',() => { startHighlanderGame(levelNum); return false; }); 
         levelsContainer.appendChild(levelP); 
