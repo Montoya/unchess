@@ -6,7 +6,7 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="HandheldFriendly" content="true">
   <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, minimal-ui">
-  <meta name="description" content="Clear the board">
+  <meta name="description" content="A puzzle game that defies expectations">
   <meta name="author" content="Christian Montoya">
   <base target="_top">
   <title>Unchess</title>
@@ -38,32 +38,74 @@
       -webkit-filter: drop-shadow(0 0 3px rgba(255, 255, 255, .7));
       filter: drop-shadow(0 0 3px rgba(255, 255, 255, .7));
     }
-
     #logo-cite {
       margin-bottom: 7px;
     }
-
     #logo img {
       vertical-align: bottom;
     }
 
-    body { 
+    /* blood color : D10000 */
+    /* blood color on dark : FF1E1E */
+    html, body { 
       font-family:'Plantin MT Pro','Times New Roman',Times,serif; 
+      font-size:10px; 
     }
     h1,h2,h3,h4,h5,h6 { font-weight:inherit; }
 
-    .chessBoard { display:table; border-collapse: collapse; }
+    @keyframes capture {
+      from { 
+        color:#d10000; 
+      }
+      to {
+        color:inherit; 
+      }
+    }
+
+    @keyframes captureDark { 
+      from { 
+        color:#ff1e1e; 
+      }
+      to { 
+        color:inherit; 
+      }
+    }
+
+    body.themeDark { 
+      color:#f0f0f0;
+      background-color:#111; 
+    }
+    .chessBoard { display:table; border-collapse: collapse; margin:0 auto; cursor:pointer; }
     .chessRow { display:table-row; }
     .chessCell { 
       font-family:'Nishiki-teki';
       font-weight:500; 
       display:table-cell; 
-      border:2px solid #222;
-      width:88px; 
-      height:88px;
-      font-size:64px; 
+      border:0.2rem solid #222;
+      width:8.8rem; 
+      height:8.8rem;
+      font-size:6.4rem; 
       text-align:center;
-      line-height:88px; 
+      line-height:1.0;
+      vertical-align:middle;
+    }
+    body.themeDark .chessCell { 
+      border-color:#ccc; 
+    }
+    .chessCell.selected { 
+      color:#d10000; 
+      font-size:7.2rem;
+      height:8.8rem!important;
+      line-height:8.8rem;
+    }
+    body.themeDark .chessCell.selected { 
+      color:#ff1e1e; 
+    }
+    .chessCell.captured { 
+      animation:capture 1s; 
+    }
+    body.themeDark .chessCell.captured { 
+      animation-name:captureDark; 
     }
     .chessKing::after { 
       content: "\002654"; 
@@ -81,58 +123,830 @@
       content: "\002658";
     }
 
-    body.themeDark { 
-      color:#fafafa;
-      background-color:#111; 
+    body {
+      display:flex; 
+      justify-content:center;
+      align-items:center;
+      width:100vw; 
+      height:100vh;
+      margin:0;  
+      padding:0;
     }
-    body.themeDark .chessCell { 
-      border-color:#ccc; 
+    #DominUI { 
+      width:48rem;
+      height:64rem;
     }
-
+    .DominButton { 
+      cursor:pointer; 
+    }
+    .DominButton:hover { 
+      animation:0.4s linear 0s 1 reverse capture; 
+      animation-fill-mode: both;
+    }
+    body.themeDark .DominButton:hover { 
+      animation-name:captureDark; 
+    }
+    #screenStart { 
+      text-align:center;
+    }
+    h1 { 
+      font-size:4.8rem; 
+      padding-top:1.6rem;
+      padding-bottom:6.4rem; 
+    }
+    #screenStartGameOptions { 
+      padding-bottom:5rem;
+      font-size:3.2rem; 
+    }
+    #screenStartMenuOptions { 
+      font-size:2.4rem; 
+    }
+    #screenAbout, #screenSettings, #screenLevelSelect { 
+      font-size:2.4rem; 
+    }
+    .screenNavHeader {
+      font-size:2.4rem; 
+      height:4rem; 
+    }
+    .screenContent { 
+      height:60rem; 
+      overflow-y:scroll; 
+    }
+    .screenHeader { 
+      font-size:3.2rem;
+    }
+    .examplePiece { 
+      font-family:'Nishiki-teki';
+      font-weight:500; 
+      font-size:4.8rem;
+      float:left; 
+      padding:0 1.2rem 0 0; 
+    }
+    #levelSelectContent .completed { 
+      text-decoration:line-through;
+    }
+    #playBoard { 
+      margin-top:2.4rem; 
+    }
   </style>
 </head>
 
-<body>
-  <h1>Hello, world!</h1>
-  <div id="play-board" class="main">
-    <div class="chessBoard moveHints">
-      <div class="chessRow">
-        <span data-pos-x="0" data-pos-y="0" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="1" data-pos-y="0" data-piece="3" class="chessCell chessRook"></span>
-        <span data-pos-x="2" data-pos-y="0" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="3" data-pos-y="0" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="4" data-pos-y="0" data-piece="0" class="chessCell empty"></span>
+<body class="themeLight">
+
+  <div id="DominUI">
+    <div id="screenStart" class="DominScreen"> 
+      <h1 id="screenStartTitle">Unchess</h1>
+      <div id="screenStartGameOptions">
+        <p class="DominButton" data-to-screen="screenLevelSelect" data-followup="listAnarchyLevels">Anarchy</p>
+        <p class="DominButton" data-to-screen="screenLevelSelect" data-followup="listMutinyLevels">Mutiny</p>
+        <p class="DominButton" data-to-screen="screenLevelSelect" data-followup="listHighlanderLevels">Highlander</p>
       </div>
-      <div class="chessRow">
-        <span data-pos-x="0" data-pos-y="1" data-piece="4" class="chessCell chessBishop chessClickable"></span>
-        <span data-pos-x="1" data-pos-y="1" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="2" data-pos-y="1" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="3" data-pos-y="1" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="4" data-pos-y="1" data-piece="0" class="chessCell empty"></span>
-      </div>
-      <div class="chessRow">
-        <span data-pos-x="0" data-pos-y="2" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="1" data-pos-y="2" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="2" data-pos-y="2" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="3" data-pos-y="2" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="4" data-pos-y="2" data-piece="0" class="chessCell chessKnight"></span>
-      </div>
-      <div class="chessRow">
-        <span data-pos-x="0" data-pos-y="3" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="1" data-pos-y="3" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="2" data-pos-y="3" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="3" data-pos-y="3" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="4" data-pos-y="3" data-piece="0" class="chessCell empty"></span>
-      </div>
-      <div class="chessRow">
-        <span data-pos-x="0" data-pos-y="4" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="1" data-pos-y="4" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="2" data-pos-y="4" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="3" data-pos-y="4" data-piece="0" class="chessCell empty"></span>
-        <span data-pos-x="4" data-pos-y="4" data-piece="2" class="chessCell chessKnight"></span>
+      <div id="screenStartMenuOptions">
+        <p class="DominButton" data-to-screen="screenAbout">About</p>
+        <p class="DominButton" data-to-screen="screenSettings">Settings</p>
       </div>
     </div>
+    <div id="screenPlay" class="DominScreen">
+      <div class="screenNavHeader"><span class="DominButton" data-to-screen="screenLevelSelect">&laquo; Back</span></div>
+      <div id="playBoard"></div>
+    </div>
+    <div id="screenLevelSelect" class="DominScreen">
+      <div class="screenNavHeader"><span class="DominButton" data-to-screen="screenStart">&laquo; Back</span></div>
+      <h2 class="screenHeader" id="levelSelectHeader">Choose a level</h2>
+      <div id="levelSelectContent"></div>
+    </div>
+    <div id="screenAbout" class="DominScreen">
+      <div class="screenNavHeader"><span class="DominButton" data-to-screen="screenStart">&laquo; Back</span></div>
+      <div class="screenContent">
+        <h2 class="screenHeader">About</h2>
+        <p>Unchess is a solo puzzle game based on the rules of chess. Each chess piece moves as you would expect:</p>
+        <p><span class="examplePiece chessBishop"></span> The bishop can only move in diagonal lines.</p>
+        <p><span class="examplePiece chessKnight"></span> The knight can jump in an L shape, two and one spaces or vice-versa.</p>
+        <p><span class="examplePiece chessRook"></span> The rook can only move in straight lines.</p>
+        <p>There are three modes of play: Anarchy, Mutiny, and Highlander.</p>
+        <h3 class="sectionHeader">Anarchy</h3>
+        <p>Your goal is to eliminate all the pieces. Click any piece to select it, then click another piece to capture it, removing both pieces from the board. Continue until the board is empty.</p>
+        <h3 class="sectionHeader">Mutiny</h3>
+        <p>Your goal is to eliminate the king, but first you must eliminate all the other pieces on your way to the king. Find the path that leads to the king! 
+          You will start with one piece selected. Click on another piece to capture it. When you do, you become that piece. Continue until you reach the king.</p>
+        <h3 class="sectionHeader">Highlander</h3>
+        <p>Your goal is to capture pieces until only one piece remains. Click any piece to select it, then click another piece to capture it, removing it from the board. Continue until only one piece is left.</p>
+      </div>
+    </div>
+    <div id="screenSettings" class="DominScreen">
+      <div class="screenNavHeader"><span class="DominButton" data-to-screen="screenStart">&laquo; Back</span></div>
+      <h2 class="screenHeader">Settings</h2>
+      <p>There are no settings... yet.</p>
+    </div>
   </div>
+
+  <script type="text/javascript">
+
+    // via https://leetcode.com/problems/integer-to-english-words/solutions/1213496/javascript/
+    /**
+     * @param {number} num
+     * @return {string}
+     */
+    const numberToWords = function(num) {
+        const LT20 = [
+          "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", 
+          "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+        ];
+        const TENS = [
+          "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" 
+        ];
+        const thousands = {
+          "1e9": "Billion",
+          "1e6": "Million",
+          "1e3": "Thousand",
+        };
+
+        function toWords(n) {
+          if (n === 0) return [];
+          if (n < 20) {
+            return [LT20[n]];
+          }
+          if (n < 100) {
+            return [TENS[~~(n / 10)]].concat(toWords(n % 10));
+          }
+          if (n < 1000) {
+            return [LT20[~~(n / 100)]].concat("Hundred", toWords(n % 100));
+          }
+          for (const [base, word] of Object.entries(thousands)) {
+            if (n / base >= 1) {
+              return toWords(~~(n / base)).concat(word, toWords(n % base));
+            }
+          }
+        }
+
+        return toWords(num).join(" ") || "Zero"; 
+    };
+
+    const anarchyGameData = [
+      {
+        "mode":1,
+        "set":1,
+        "board":1,
+        "data":"00004|04020|00003|04000|00030", 
+        "completed":false
+      },
+      {
+        "mode":1,
+        "set":1,
+        "board":2,
+        "data":"40000|00040|00300|30020|02000", 
+        "completed":false
+      },
+      {
+        "mode":1,
+        "set":1,
+        "board":3,
+        "data":"00040|03000|00200|00300|02040", 
+        "completed":false
+      },
+      {
+        "mode":1,
+        "set":1,
+        "board":4,
+        "data":"00400|03020|40020|00200|40300",
+        "completed":false
+      }, 
+      {
+        "mode":1,
+        "set":1,
+        "board":5,
+        "data":"00000|32004|04300|00030|02004",
+        "completed":false
+      },
+      {
+        "mode":1,
+        "set":1,
+        "board":6,
+        "data":"02000|00003|04032|40040|00300",
+        "completed":false
+      }
+    ]; 
+
+    const mutinyGameData = [
+      { 
+        "mode":2,
+        "set":1,
+        "board":1,
+        "data":"40000|00300|00000|20010|00000",
+        "start":[0,0],
+        "completed":false
+      },
+      { 
+        "mode":2,
+        "set":1,
+        "board":2,
+        "data":"40002|00000|03100|00000|30004",
+        "start":[4,4],
+        "completed":false
+      },
+      { 
+        "mode":2,
+        "set":1,
+        "board":3,
+        "data":"00000|01000|00200|02020|20200",
+        "start":[2,4],
+        "completed":false
+      },
+      { 
+        "mode":2,
+        "set":1,
+        "board":4,
+        "data":"03000|00030|33000|00310|00000",
+        "start":[2,3],
+        "completed":false
+      },
+      { 
+        "mode":2,
+        "set":1,
+        "board":5,
+        "data":"00404|40404|00000|40400|00100",
+        "start":[2,3],
+        "completed":false
+      },
+      { 
+        "mode":2,
+        "set":1,
+        "board":6,
+        "data":"00002|03304|00010|04020|03004",
+        "start":[1,4],
+        "completed":false
+      },
+    ]; 
+
+    const highlanderGameData = [ 
+      { 
+        "mode":3,
+        "set":1,
+        "board":1,
+        "data":"00000|00420|04030|00000|00000", 
+        "completed":false
+      },
+      { 
+        "mode":3,
+        "set":1,
+        "board":2,
+        "data":"00304|00000|00203|30000|00000", 
+        "completed":false
+      }, 
+      { 
+        "mode":3,
+        "set":1,
+        "board":3,
+        "data":"00042|00300|40004|03000|00030", 
+        "completed":false
+      }, 
+      {
+        "mode":3,
+        "set":1,
+        "board":4,
+        "data":"00032|03000|00400|20000|02000", 
+        "completed":false
+      }, 
+      {
+        "mode":3,
+        "set":1,
+        "board":5,
+        "data":"00000|30004|04300|00030|02004", 
+        "completed":false
+      },
+      {
+        "mode":3,
+        "set":1,
+        "board":6,
+        "data":"02000|00003|04032|40040|00300",
+        "completed":false
+      }
+    ]; 
+
+    const chessPieces = [
+      "empty",
+      "chessKing",
+      "chessBishop",
+      "chessKnight", 
+      "chessRook"
+    ]; 
+
+    const chessPiecesLookup = { 
+      "empty":0,
+      "chessKing":1,
+      "chessBishop":2,
+      "chessKnight":3,
+      "chessRook":4
+    }; 
+
+    /* DominUI assumes that the Domin IDs and classes are used in the document */ 
+    class DominUI { 
+      constructor() { 
+        try { 
+          this.container = document.getElementById('DominUI'); 
+          // assume that the game container contains screens
+          this.screens = this.container.getElementsByClassName('DominScreen'); 
+          if(this.screens.length < 1) { throw "No screens"; }
+          // enable all buttons that change screens
+          this.buttons = this.container.getElementsByClassName('DominButton'); 
+          if(this.buttons.length < 1) { throw "No buttons"; }
+        } catch(err) { 
+          console.log("The document does not contain a valid UI for Domin to initialize."); 
+          return; 
+        }
+        // hide all screens after the first one 
+        if(this.screens.length > 0) { 
+          for(let i = 1; i < this.screens.length; i++) { 
+            this.screens[i].style.display = 'none'; 
+          }
+        }
+        // enable all buttons
+        for(let i = 0; i < this.buttons.length; i++) { 
+          let btn = this.buttons[i]; 
+          if(btn.dataset.toScreen) { 
+            btn.addEventListener('click', () => { this.changeScreen(btn.dataset.toScreen); }, false); 
+          }
+          if(btn.dataset.followup) { 
+            // it is assumed that any "followup" function is added to the DominUI object so it can by called by reference this way 
+            btn.addEventListener('click', () => { this[btn.dataset.followup].call(); }, false); 
+          }
+        }
+      }
+
+      changeScreen(newScreenId) { 
+        for(let i = 0; i < this.screens.length; i++) { 
+          this.screens[i].style.display = 'none'; 
+        }
+        document.getElementById(newScreenId).style.display = 'block'; 
+      }
+    }
+
+    const getPieceAt = (x,y) => { 
+      return document.querySelector("#playBoard span:not(.empty)[data-pos-x='"+x+"'][data-pos-y='"+y+"']"); 
+    }
+
+    const getCellAt = (x,y) => { 
+      return document.querySelector("#playBoard span[data-pos-x='"+x+"'][data-pos-y='"+y+"']"); 
+    }
+
+    const getPossibleMoves = (el) => { 
+      let possibleMoves = []; 
+      const selectedX = parseInt(el.dataset.posX); 
+      const selectedY = parseInt(el.dataset.posY); 
+      const selectedPiece = parseInt(el.dataset.piece); 
+      let newX, newY, newCell, newPiece; 
+      switch(selectedPiece) { 
+        case chessPiecesLookup.chessBishop: 
+          // 4 directions
+          newX = selectedX - 1; 
+          newY = selectedY - 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX--; 
+              newY--; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX - 1; 
+          newY = selectedY + 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX--; 
+              newY++; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX + 1; 
+          newY = selectedY - 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX++; 
+              newY--; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX + 1; 
+          newY = selectedY + 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX++; 
+              newY++; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          break; 
+        case chessPiecesLookup.chessKnight: 
+          // 8 checks 
+          newX = selectedX - 1; 
+          newY = selectedY - 2; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX - 2; 
+          newY = selectedY - 1; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX + 1; 
+          newY = selectedY + 2; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX + 2; 
+          newY = selectedY + 1; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX - 1; 
+          newY = selectedY + 2; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX - 2; 
+          newY = selectedY + 1; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX + 1; 
+          newY = selectedY - 2; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          newX = selectedX + 2; 
+          newY = selectedY - 1; 
+          if(null!==getPieceAt(newX,newY)) { 
+            possibleMoves.push(newX+"|"+newY); 
+          }
+          break; 
+        case chessPiecesLookup.chessRook: 
+          // 4 directions
+          newX = selectedX - 1; 
+          newY = selectedY; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX--; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX; 
+          newY = selectedY - 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newY--; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX + 1; 
+          newY = selectedY; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newX++; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          newX = selectedX; 
+          newY = selectedY + 1; 
+          newCell = getCellAt(newX,newY); 
+          while(null!==newCell) { 
+            newPiece = parseInt(newCell.dataset.piece); 
+            if(newPiece > 0) { 
+              possibleMoves.push(newX+"|"+newY); 
+              newCell = null; 
+            }
+            else { 
+              newY++; 
+              newCell = getCellAt(newX,newY); 
+            }
+          }
+          break; 
+      }
+      return possibleMoves; 
+    }; 
+
+    const removePiece = (el) => { 
+      el.className = "chessCell empty"; 
+      el.dataset.piece = chessPiecesLookup.empty; 
+    }
+
+    const handleAnarchyClick = (evt) => { 
+      // assume a valid game of anarchy unchess is in play 
+      let selected = document.querySelector("#playBoard span.selected"); 
+      if(null===selected) { 
+        // nothing is selected! 
+        evt.target.classList.add("selected");  
+      }
+      else if (evt.target === selected) { 
+        // user has clicked the selected piece, so let's unselect it
+        evt.target.classList.remove("selected"); 
+      }
+      else { 
+        // determine if a move is possible... 
+        // first, get all the possible moves
+        const possibleMoves = getPossibleMoves(selected); 
+        // then, determine if this is in the set of possible moves 
+        try { 
+          let targetMove = evt.target.dataset.posX + "|" + evt.target.dataset.posY; 
+          if(possibleMoves.includes(targetMove)) { 
+            // we have a hit! this is anarchy, so both pieces are eliminated 
+            removePiece(evt.target); 
+            removePiece(selected); 
+            selected.removeEventListener("click",handleAnarchyClick); 
+            evt.target.removeEventListener("click",handleAnarchyClick); 
+            checkAnarchyWin(); 
+          }
+          else { 
+            // user has clicked a different piece that is not a valid move, so just unselect
+            selected.classList.remove("selected"); 
+          }
+        } catch(err) { 
+          console.log(err); 
+        }
+      }
+    }; 
+
+    const checkAnarchyWin = () => { 
+      if(null===document.querySelector("#playBoard span:not(.empty)")) { 
+        alert("YOU WIN!"); 
+        let board = parseInt(document.getElementById('playBoard').dataset.board); 
+        anarchyGameData[board].completed = true; 
+        document.getElementById('anarchy-level-'+board).classList.add('completed'); 
+        unchessGame.changeScreen("screenLevelSelect"); 
+      }
+    };
+
+    const handleMutinyClick = (evt) => { 
+      // assume a valid game of mutiny unchess is in play 
+      let selected = document.querySelector("#playBoard span.selected"); 
+      if(null===selected) { 
+        // this should never happen in a game of mutiny 
+        alert("This game of mutiny is broken..."); 
+        return; 
+      }
+      else { 
+        // determine if a move is possible... 
+        // first, get all the possible moves
+        const possibleMoves = getPossibleMoves(selected); 
+        // then, determine if this is in the set of possible moves 
+        try { 
+          let targetMove = evt.target.dataset.posX + "|" + evt.target.dataset.posY; 
+          if(possibleMoves.includes(targetMove)) { 
+            // first, check if the player is trying to capture the king
+            if(evt.target.dataset.piece == chessPiecesLookup.chessKing) { 
+              let pieces = document.querySelectorAll("#playBoard span:not(.empty)"); 
+              if(pieces.length > 2) { 
+                // player cannot capture the king yet
+                alert("You have to eliminate all the other pieces before you can capture the king!"); 
+              }
+              else { 
+                removePiece(selected); 
+                removePiece(evt.target); 
+                selected.removeEventListener("click",handleMutinyClick); 
+                evt.target.removeEventListener("click",handleMutinyClick); 
+                alert("YOU WIN!"); 
+                let board = parseInt(document.getElementById('playBoard').dataset.board); 
+                mutinyGameData[board].completed = true; 
+                document.getElementById('mutiny-level-'+board).classList.add('completed'); 
+                unchessGame.changeScreen("screenLevelSelect"); 
+              }
+            }
+            else { 
+              // we have a hit! this is mutiny, so the selected piece is eliminated and the target piece becomes the selected piece 
+              removePiece(selected); 
+              selected.removeEventListener("click",handleMutinyClick); 
+              evt.target.classList.add('selected'); 
+            }
+          }
+        } catch(err) { 
+          console.log(err); 
+        }
+      }
+    }; 
+
+    const handleHighlanderClick = (evt) => { 
+      // assume a valid game of highlander unchess is in play 
+      evt.target.classList.remove("captured"); 
+      let selected = document.querySelector("#playBoard span.selected"); 
+      if(null===selected) { 
+        // nothing is selected! 
+        evt.target.classList.add("selected");  
+      }
+      else if (evt.target === selected) { 
+        // user has clicked the selected piece, so let's unselect it
+        evt.target.classList.remove("selected"); 
+      }
+      else { 
+        // determine if a move is possible... 
+        // first, get all the possible moves
+        const possibleMoves = getPossibleMoves(selected); 
+        // then, determine if this is in the set of possible moves 
+        try { 
+          let targetMove = evt.target.dataset.posX + "|" + evt.target.dataset.posY; 
+          selected.classList.remove("selected"); 
+          if(possibleMoves.includes(targetMove)) { 
+            // we have a hit! this is highlander, so the selected piece overtakes the target piece 
+            evt.target.dataset.piece = selected.dataset.piece; 
+            // trick to restart the animation https://css-tricks.com/restart-css-animation/
+            void evt.target.offsetWidth;
+            evt.target.className = selected.className + " captured"; 
+            removePiece(selected); 
+            selected.removeEventListener("click",handleHighlanderClick); 
+            checkHighlanderWin(); 
+          }
+        } catch(err) { 
+          console.log(err); 
+        }
+      }
+    };  
+
+    const checkHighlanderWin = () => { 
+      let pieces = document.querySelectorAll("#playBoard span:not(.empty)"); 
+      if(pieces.length < 2) { 
+        alert("YOU WIN!"); 
+        let board = parseInt(document.getElementById('playBoard').dataset.board); 
+        highlanderGameData[board].completed = true; 
+        document.getElementById('highlander-level-'+board).classList.add('completed'); 
+        unchessGame.changeScreen("screenLevelSelect"); 
+      }
+    };
+
+    const makeBoardWithData = (boardData) => { 
+      const board = document.createElement("div"); 
+      board.id = "playBoard"; 
+      const chessBoard = document.createElement("div"); 
+      chessBoard.className = "chessBoard"; 
+      for(let y = 0; y < boardData.length; y++) { 
+        let chessRow = document.createElement("div"); 
+        chessRow.className = "chessRow"; 
+        let rowData = boardData[y].split(""); 
+        for(let x = 0; x < rowData.length; x++) { 
+          let chessCell = document.createElement("span"); 
+          chessCell.setAttribute("data-pos-x",x); 
+          chessCell.setAttribute("data-pos-y",y); 
+          chessCell.setAttribute("data-piece",rowData[x]); 
+          chessCell.className = "chessCell "+chessPieces[rowData[x]]; 
+          chessRow.appendChild(chessCell); 
+        }
+        chessBoard.appendChild(chessRow); 
+      }
+      board.appendChild(chessBoard); 
+      return board; 
+    }; 
+
+    const unchessGame = new DominUI(); 
+    
+    unchessGame.listAnarchyLevels = () => { 
+      const levelsContainer = document.createElement('div'); 
+      levelsContainer.id = 'levelSelectContent'; 
+      for(let i=0; i < anarchyGameData.length; i++) { 
+        let level = anarchyGameData[i]; 
+        let levelNum = i; 
+        let levelName = numberToWords(level.board); 
+        let levelP = document.createElement('p'); 
+        levelP.id = 'anarchy-level-'+levelNum; 
+        levelP.className = 'DominButton'; 
+        if(anarchyGameData[i].completed) { 
+          levelP.className += ' completed'; 
+        }
+        levelP.textContent = levelName; 
+        levelP.addEventListener('click',() => { startAnarchyGame(levelNum); return false; }); 
+        levelsContainer.appendChild(levelP); 
+      }
+      document.getElementById('levelSelectContent').replaceWith(levelsContainer); 
+    }; 
+
+    const startAnarchyGame = (num) => { 
+      if(undefined==num) { num = 0; }
+      const boardData = anarchyGameData[num].data.split("|"); 
+      document.getElementById("playBoard").replaceWith(makeBoardWithData(boardData)); 
+      document.getElementById("playBoard").dataset.board = num; 
+      document.querySelectorAll("#playBoard span:not(.empty)").forEach((piece) => {
+        piece.addEventListener("click",handleAnarchyClick);
+      });  
+      unchessGame.changeScreen('screenPlay'); 
+    }; 
+
+    unchessGame.listMutinyLevels = () => { 
+      const levelsContainer = document.createElement('div'); 
+      levelsContainer.id = 'levelSelectContent'; 
+      for(let i=0; i < mutinyGameData.length; i++) { 
+        let level = mutinyGameData[i]; 
+        let levelNum = i; 
+        let levelName = numberToWords(level.board); 
+        let levelP = document.createElement('p'); 
+        levelP.id = 'mutiny-level-'+levelNum; 
+        levelP.className = 'DominButton'; 
+        if(mutinyGameData[i].completed) { 
+          levelP.className += ' completed'; 
+        }
+        levelP.textContent = levelName; 
+        levelP.addEventListener('click',() => { startMutinyGame(levelNum); return false; }); 
+        levelsContainer.appendChild(levelP); 
+      }
+      document.getElementById('levelSelectContent').replaceWith(levelsContainer); 
+    }; 
+
+    const startMutinyGame = (num) => { 
+      if(undefined==num) { num = 0; }
+      const boardData = mutinyGameData[num].data.split("|"); 
+      document.getElementById("playBoard").replaceWith(makeBoardWithData(boardData)); 
+      document.getElementById("playBoard").dataset.board = num; 
+      // a game of mutiny always starts with a selected piece 
+      let startPosition = mutinyGameData[num].start; 
+      let startPiece = getPieceAt(startPosition[0],startPosition[1]); 
+      startPiece.classList.add('selected'); 
+      document.querySelectorAll("#playBoard span:not(.empty)").forEach((piece) => {
+        piece.addEventListener("click",handleMutinyClick);
+      });  
+      unchessGame.changeScreen('screenPlay'); 
+    }; 
+
+    unchessGame.listHighlanderLevels = () => { 
+      const levelsContainer = document.createElement('div'); 
+      levelsContainer.id = 'levelSelectContent'; 
+      for(let i=0; i < highlanderGameData.length; i++) { 
+        let level = highlanderGameData[i]; 
+        let levelNum = i; 
+        let levelName = numberToWords(level.board); 
+        let levelP = document.createElement('p'); 
+        levelP.id = 'highlander-level-'+levelNum; 
+        levelP.className = 'DominButton'; 
+        if(highlanderGameData[i].completed) { 
+          levelP.className += ' completed'; 
+        }
+        levelP.textContent = levelName; 
+        levelP.addEventListener('click',() => { startHighlanderGame(levelNum); return false; }); 
+        levelsContainer.appendChild(levelP); 
+      }
+      document.getElementById('levelSelectContent').replaceWith(levelsContainer); 
+    }; 
+
+    const startHighlanderGame = (num) => { 
+      if(undefined==num) { num = 0; }
+      const boardData = highlanderGameData[num].data.split("|"); 
+      document.getElementById("playBoard").replaceWith(makeBoardWithData(boardData)); 
+      document.getElementById("playBoard").dataset.board = num; 
+      document.querySelectorAll("#playBoard span:not(.empty)").forEach((piece) => {
+        piece.addEventListener("click",handleHighlanderClick);
+      });
+      unchessGame.changeScreen('screenPlay'); 
+    }; 
+
+    /* the following code is specific to a web context and would be changed for a wrapper context like Electron */ 
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.className = "themeDark"; 
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      const newColorScheme = e.matches ? "dark" : "light";
+      if("dark"==newColorScheme) { 
+        document.body.className = "themeDark"; 
+      }
+      else { 
+        document.body.className = "themeLight"; 
+      }
+    });
+  </script>
 </body>
 
 </html>
