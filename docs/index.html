@@ -188,6 +188,7 @@
     #playBoard { 
       margin-top:2.4rem; 
     }
+    #reset { float:right; }
   </style>
 </head>
 
@@ -202,12 +203,13 @@
         <p class="DominButton" data-to-screen="screenLevelSelect" data-followup="listHighlanderLevels">Highlander</p>
       </div>
       <div id="screenStartMenuOptions">
-        <p class="DominButton" data-to-screen="screenAbout">About</p>
+        <p class="DominButton" data-to-screen="screenAbout">How to Play</p>
         <p class="DominButton" data-to-screen="screenSettings">Settings</p>
       </div>
     </div>
     <div id="screenPlay" class="DominScreen">
-      <div class="screenNavHeader"><span class="DominButton" data-to-screen="screenLevelSelect">&laquo; Back</span></div>
+      <div class="screenNavHeader"><span class="DominButton" data-to-screen="screenLevelSelect">&laquo; Back</span>
+        <span id="reset" class="DominButton">Reset</span></div>
       <div id="playBoard"></div>
     </div>
     <div id="screenLevelSelect" class="DominScreen">
@@ -218,7 +220,7 @@
     <div id="screenAbout" class="DominScreen">
       <div class="screenNavHeader"><span class="DominButton" data-to-screen="screenStart">&laquo; Back</span></div>
       <div class="screenContent">
-        <h2 class="screenHeader">About</h2>
+        <h2 class="screenHeader">How to Play</h2>
         <p>Unchess is a solo puzzle game based on the rules of chess. Each chess piece moves as you would expect:</p>
         <p><span class="examplePiece chessBishop"></span> The bishop can only move in diagonal lines.</p>
         <p><span class="examplePiece chessKnight"></span> The knight can jump in an L shape, two and one spaces or vice-versa.</p>
@@ -834,6 +836,14 @@
       return board; 
     }; 
 
+    const makeResetButton = () => { 
+      let newReset = document.createElement('span'); 
+      newReset.id = 'reset'; 
+      newReset.className = 'DominButton'; 
+      newReset.textContent = 'Reset'; 
+      return newReset; 
+    }
+
     const unchessGame = new DominUI(); 
     
     unchessGame.listAnarchyLevels = () => { 
@@ -858,6 +868,9 @@
 
     const startAnarchyGame = (num) => { 
       if(undefined==num) { num = 0; }
+      let newReset = makeResetButton(); 
+      newReset.addEventListener('click', () => { startAnarchyGame(num); }); 
+      document.getElementById("reset").replaceWith(newReset); 
       const boardData = anarchyGameData[num].data.split("|"); 
       document.getElementById("playBoard").replaceWith(makeBoardWithData(boardData)); 
       document.getElementById("playBoard").dataset.board = num; 
@@ -889,6 +902,9 @@
 
     const startMutinyGame = (num) => { 
       if(undefined==num) { num = 0; }
+      let newReset = makeResetButton(); 
+      newReset.addEventListener('click', () => { startMutinyGame(num); }); 
+      document.getElementById("reset").replaceWith(newReset); 
       const boardData = mutinyGameData[num].data.split("|"); 
       document.getElementById("playBoard").replaceWith(makeBoardWithData(boardData)); 
       document.getElementById("playBoard").dataset.board = num; 
@@ -924,6 +940,9 @@
 
     const startHighlanderGame = (num) => { 
       if(undefined==num) { num = 0; }
+      let newReset = makeResetButton(); 
+      newReset.addEventListener('click', () => { startHighlanderGame(num); }); 
+      document.getElementById("reset").replaceWith(newReset); 
       const boardData = highlanderGameData[num].data.split("|"); 
       document.getElementById("playBoard").replaceWith(makeBoardWithData(boardData)); 
       document.getElementById("playBoard").dataset.board = num; 
