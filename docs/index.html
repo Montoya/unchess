@@ -71,11 +71,20 @@
       }
     }
 
+    @keyframes slideDown { 
+      from { 
+        top:-50%;
+      }
+      to { 
+        top:50%; 
+      }
+    }
+
     body.themeDark { 
       color:#f0f0f0;
       background-color:#111; 
     }
-    .chessBoard { display:table; border-collapse: collapse; margin:0 auto; cursor:pointer; }
+    .chessBoard { display:table; table-layout:fixed; border-collapse: collapse; margin:0 auto; cursor:pointer; }
     .chessRow { display:table-row; }
     .chessCell { 
       font-family:'Nishiki-teki';
@@ -138,15 +147,17 @@
     }
     .DominModal { 
       position:absolute;
-      top:50%;
+      top:-50%;
       left:50%;
-      width:15rem;
-      height:10rem;
-      margin:-5rem 0 0 -7.5rem; 
+      width:32rem;
+      height:24rem;
+      margin:-12rem 0 0 -16rem; 
       background-color:#fff; 
       border:1px solid #222; 
       box-shadow:0.4rem 0.4rem 0 rgba(43,43,43,0.5); 
-      display:none; 
+    }
+    .DominModal.show { 
+      animation:0.2s ease-in 0s 1 forwards slideDown; 
     }
     body.themeDark .DominModal { 
       background-color:#111; 
@@ -504,6 +515,10 @@
           this.screens[i].style.display = 'none'; 
         }
         document.getElementById(newScreenId).style.display = 'block'; 
+      }
+
+      showModal(newContent) { 
+
       }
     }
 
